@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,10 +18,13 @@
             </intent-filter>
         </activity>
 
-
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="bbe51c3ce4f6a4b8d79efebf08960fdf" />
+
+        <activity android:name=".PublishTopicActivity" />
+        <activity android:name=".PublishArticleActivity" />
+        <activity android:name=".WeatherActivity"></activity>
     </application>
 
 </manifest>

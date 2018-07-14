@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">DialyNote</string>
+    <string name="shortcut_label_search">天气</string>
+    <string name="shortcut_label_publish_topic">发布动态</string>
+    <string name="shortcut_label_publish_article">发布文章</string>
+    <string name="nav_home">首页</string>
+    <string name="nav_about">关于</string>
+    <string name="nav_settings">设置</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

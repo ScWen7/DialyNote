@@ -3,7 +3,6 @@ package scwen.com.dialynote.utils;
 import android.content.Context;
 import android.view.View;
 
-import com.art.activity.ImagePagerActivity;
 
 import java.util.List;
 
@@ -26,6 +25,5 @@ public class ImagePreClickListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        ImagePagerActivity.start(mContext, imgUrls, startPos);
     }
 }
