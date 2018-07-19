@@ -37,5 +37,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.8.1'
     compile 'com.alibaba:fastjson:1.1.64.android'
     compile 'org.litepal.android:core:2.0.0'
+    implementation 'com.zhihu.android:matisse:0.5.1'
 
 }
