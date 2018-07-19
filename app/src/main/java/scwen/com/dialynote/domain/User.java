@@ -1,4 +1,4 @@
-package scwen.com.dialynote.utils;
+package scwen.com.dialynote.domain;
 
 /**
  * @author yiw

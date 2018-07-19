@@ -5,6 +5,8 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import scwen.com.dialynote.domain.User;
+
 /**
  * Created by yiwei on 16/3/2.
  */
