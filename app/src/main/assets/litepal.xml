@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="demo"></dbname>
+
+    <version value="1"></version>
+
+    <list>
+
+
+        <mapping class="scwen.com.dialynote.domain.LabelBean"></mapping>
+        <mapping class="scwen.com.dialynote.domain.TopicBean"></mapping>
+    </list>
+</litepal>
