@@ -27,6 +27,7 @@
 
         <activity
             android:name=".ui.publish.PublishTopicActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>

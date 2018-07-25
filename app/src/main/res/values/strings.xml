@@ -10,4 +10,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="publish">发布</string>
+    <string name="publish_topic" />
+    <string name="location">你在哪里？</string>
+    <string name="add_lable">添加标签</string>
 </resources>

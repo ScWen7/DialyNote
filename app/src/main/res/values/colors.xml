@@ -28,4 +28,8 @@
     <color name="indicator_selected">@android:color/white</color>
     <color name="indicator_unselected">#4D000000</color>
     <color name="transparency">#00000000</color>
+    <color name="FF303030">#ff303030</color>
+    <color name="fff5f5f5">#fff5f5f5</color>
+    <color name="ff969696">#ff969696</color>
+    <color name="ffe4e4e4">#ffe4e4e4</color>
 </resources>
