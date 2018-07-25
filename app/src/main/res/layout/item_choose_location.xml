@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="76dp"
+    android:orientation="vertical"
+    android:paddingLeft="15dp">
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:maxLines="1"
+        android:text="吉羊邨"
+        android:textColor="@color/FF303030"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_location_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_location"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="南阳路与西康路交叉口西50米"
+        android:textColor="@color/ff969696"
+        android:textSize="13sp" />
+
+
+    <ImageView
+        android:id="@+id/iv_tick"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/artist_focus_tick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

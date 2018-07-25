@@ -13,4 +13,6 @@
     <string name="publish_topic" />
     <string name="location">你在哪里？</string>
     <string name="add_lable">添加标签</string>
+    <string name="search_hint">搜索附近的位置</string>
+    <string name="location_failed">定位失败</string>
 </resources>

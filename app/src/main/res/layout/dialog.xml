@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_loading_bg"
+        android:background="@drawable/shape_loading_bg"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16.0dip">

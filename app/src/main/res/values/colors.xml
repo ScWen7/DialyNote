@@ -32,4 +32,5 @@
     <color name="fff5f5f5">#fff5f5f5</color>
     <color name="ff969696">#ff969696</color>
     <color name="ffe4e4e4">#ffe4e4e4</color>
+    <color name="alpha_black">#66000000</color>
 </resources>
