@@ -2,6 +2,8 @@ package scwen.com.dialynote.retrofitmodle.http.download;
 
 
 
+import android.support.annotation.NonNull;
+
 import org.reactivestreams.Publisher;
 
 import java.io.Closeable;
@@ -16,7 +18,6 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;

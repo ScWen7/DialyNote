@@ -1,7 +1,9 @@
-package scwen.com.dialynote;
+package scwen.com.dialynote.ui.publish;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import scwen.com.dialynote.R;
 
 public class PublishArticleActivity extends AppCompatActivity {
 
