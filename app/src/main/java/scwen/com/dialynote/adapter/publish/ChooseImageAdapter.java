@@ -51,7 +51,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private boolean addEnabled = false;
 
-    private boolean preEnabled = false;
+    private boolean preEnabled = true;
 
     public boolean isPreEnabled() {
         return preEnabled;

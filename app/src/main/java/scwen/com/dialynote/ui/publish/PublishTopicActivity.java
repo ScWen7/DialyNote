@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v4.content.MimeTypeFilter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
+import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
@@ -42,6 +45,7 @@ import com.zhihu.matisse.listener.OnSelectedListener;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -108,6 +112,8 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
     private double mLatitude;  //纬度
     private double mLongitude;  //经度
 
+    private List<String> mPathList = new ArrayList<>();
+
 
     public static void start(Context context) {
         Intent intent = new Intent(context, PublishTopicActivity.class);
@@ -132,10 +138,6 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
         initRecycler();
 
 
-
-
-
-
     }
 
     private void initDrawable() {
@@ -155,13 +157,14 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
         //初始化 9图 RecyclerView
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-        Divider divider = getDivider(Color.WHITE);
+        Divider divider = UIUtils.getDivider(Color.WHITE);
         mRecyclerView.addItemDecoration(divider);
         int itemSize = (ScreenUtils.getScreenWidth(this) - (divider.getWidth() * 3) - UIUtils.dip2px(30)) / 4;
         mAdapter = new ChooseImageAdapter(this, itemSize, 9, new ChooseImageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 //预览
+                previewAlbum(position);
             }
         });
         mAdapter.setHasStableIds(true);
@@ -174,16 +177,16 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    @NonNull
-    public static Divider getDivider(@ColorInt int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int size = UIUtils.dip2px(6);
-            return new Api21ItemDivider(color, size, size);
-        } else {
-            int size = UIUtils.dip2px(2);
-            return new Api20ItemDivider(color, size, size);
-        }
+
+    /**
+     * 预览图片
+     *
+     * @param position
+     */
+    private void previewAlbum(int position) {
+        ImagePreviewActivity.start(this);
     }
+
 
     //如果有Menu,创建完后,系统会自动添加到ToolBar上
     @Override
@@ -275,7 +278,52 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
     }
 
 
-    @OnClick({R.id.tv_location, R.id.tv_lable, R.id.iv_capture, R.id.iv_choose_album})
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SELECT && resultCode == RESULT_OK) {
+            //根据 返回的数据进行 显示
+
+            List<String> pathList = Matisse.obtainPathResult(data);
+
+            if (pathList != null && pathList.size() > 0) {
+                if (pathList.size() == 1) {
+                    //因为 视频是单选，当 文件数量为1 时，进行文件类型的判断
+
+                    mPathList.addAll(pathList);
+                    String file = pathList.get(0);
+
+                    String ext = MimeTypeMap.getFileExtensionFromUrl(file);
+                    String extension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+                    if (!TextUtils.isEmpty(extension)) {
+                        if (extension.contains("video")) {
+                            //文件类型为 视频
+                            Log.e("TAG", "视频");
+                            topicType = TOPIC_VIDEO;
+                            mFrVideo.setVisibility(View.VISIBLE);
+                            mRecyclerView.setVisibility(View.GONE);
+                            Glide.with(PublishTopicActivity.this).load(file).into(mIvVideoThumb);
+                        } else {
+                            //文件类型为  图片
+                            Log.e("TAG", "图片");
+                            topicType = TOPIC_IMAGE;
+                            mFrVideo.setVisibility(View.GONE);
+                            mRecyclerView.setVisibility(View.VISIBLE);
+                            mAdapter.notifyDataSetChanged(mPathList);
+                        }
+                    }
+                } else {
+                    mPathList.addAll(pathList);
+                    mFrVideo.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mAdapter.notifyDataSetChanged(mPathList);
+                }
+            }
+
+        }
+    }
+
+    @OnClick({R.id.tv_location, R.id.tv_lable, R.id.iv_capture, R.id.iv_choose_album, R.id.fr_video})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_location:
@@ -285,14 +333,21 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
                 break;
             case R.id.iv_capture:
+
                 break;
             case R.id.iv_choose_album:
 
                 generPermissionAndChooseAlbum();
                 break;
+            case R.id.fr_video:
+                VideoPreviewActivity.start(this, mPathList.get(0));
+                break;
         }
     }
 
+    /**
+     * 申请 sd卡读取权限 成功之后选择图片
+     */
     private void generPermissionAndChooseAlbum() {
         AndPermission.with(this)
                 .runtime()
@@ -312,17 +367,20 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 .start();
     }
 
+    /**
+     * 选择相册
+     */
     private void chooseAlbum() {
-        Divider divider = getDivider(Color.WHITE);
+        Divider divider = UIUtils.getDivider(Color.WHITE);
         int itemSize = (ScreenUtils.getScreenWidth(this) - divider.getWidth() * (4)) / 3;
         Matisse.from(PublishTopicActivity.this)
-                .choose(MimeType.of(MimeType.MP4,MimeType.PNG,MimeType.JPEG), true)
+                .choose(MimeType.of(MimeType.MP4, MimeType.PNG, MimeType.JPEG), true)
                 .countable(true)
                 .capture(false)
                 .theme(R.style.MyALbum)
-                .maxSelectable(9)
+                .maxSelectablePerMediaType(9, 1)
                 .addFilter(new VideoDurationFilter(3000))
-                .addFilter(new SizeFilter( 30 * Filter.K * Filter.K))
+                .addFilter(new SizeFilter(30 * Filter.K * Filter.K))
                 .gridExpectedSize(
                         itemSize)
                 .thumbnailScale(0.85f)
@@ -332,7 +390,8 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                     public void onSelected(
                             @NonNull List<Uri> uriList, @NonNull List<String> pathList) {
                         // DO SOMETHING IMMEDIATELY HERE
-                        Log.e("tag", "onSelected: pathList="+pathList );
+                        Log.e("tag", "onSelected: pathList=" + pathList);
+
 
                     }
                 })
@@ -341,7 +400,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                     @Override
                     public void onCheck(boolean isChecked) {
                         // DO SOMETHING IMMEDIATELY HERE
-                        Log.e("tag", "onCheck: isChecked="+isChecked );
+                        Log.e("tag", "onCheck: isChecked=" + isChecked);
                     }
                 })
                 .forResult(REQUEST_CODE_SELECT);

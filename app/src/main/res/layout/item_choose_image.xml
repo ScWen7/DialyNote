@@ -9,10 +9,5 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
 
-    <View
-        android:id="@+id/view_fraction"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:background="#67000000" />
+
 </FrameLayout>

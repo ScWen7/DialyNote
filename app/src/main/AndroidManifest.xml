@@ -45,8 +45,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity android:name=".ui.publish.PublishArticleActivity" />
         <activity android:name=".WeatherActivity" />
-        <activity android:name=".ui.publish.ChooseLocationActivity"></activity>
-        <activity android:name=".ui.publish.ChooseLabelActivity"></activity>
+        <activity android:name=".ui.publish.ChooseLocationActivity" />
+        <activity android:name=".ui.publish.ChooseLabelActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -55,8 +55,11 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths_public"></meta-data>
+                android:resource="@xml/file_paths_public" />
         </provider>
+
+        <activity android:name=".ui.publish.VideoPreviewActivity" />
+        <activity android:name=".ui.publish.ImagePreviewActivity" ></activity>
     </application>
 
 </manifest>

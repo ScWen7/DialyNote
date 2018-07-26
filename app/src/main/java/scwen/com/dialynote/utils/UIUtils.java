@@ -1,9 +1,16 @@
 package scwen.com.dialynote.utils;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import scwen.com.dialynote.weight.divider.Api20ItemDivider;
+import scwen.com.dialynote.weight.divider.Api21ItemDivider;
+import scwen.com.dialynote.weight.divider.Divider;
 
 /**
  * Created by 解晓辉 on 2017/2/15.
@@ -124,5 +131,16 @@ public class UIUtils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+
+    @NonNull
+    public static Divider getDivider(@ColorInt int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int size = UIUtils.dip2px(6);
+            return new Api21ItemDivider(color, size, size);
+        } else {
+            int size = UIUtils.dip2px(2);
+            return new Api20ItemDivider(color, size, size);
+        }
+    }
 
 }
