@@ -15,4 +15,5 @@
     <string name="add_lable">添加标签</string>
     <string name="search_hint">搜索附近的位置</string>
     <string name="location_failed">定位失败</string>
+    <string name="error_original">大小不超过 %1$sM。</string>
 </resources>

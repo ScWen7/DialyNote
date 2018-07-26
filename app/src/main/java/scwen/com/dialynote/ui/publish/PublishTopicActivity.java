@@ -4,14 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +25,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.core.PoiItem;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.zhihu.matisse.filter.Filter;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
+import com.zhihu.matisse.listener.OnCheckedListener;
+import com.zhihu.matisse.listener.OnSelectedListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,12 +54,20 @@ import scwen.com.dialynote.contract.PublishContract;
 import scwen.com.dialynote.dialog.LoadingDialog;
 import scwen.com.dialynote.presenter.PublishPresenter;
 import scwen.com.dialynote.utils.ScreenUtils;
+import scwen.com.dialynote.utils.SizeFilter;
 import scwen.com.dialynote.utils.UIUtils;
+import scwen.com.dialynote.utils.VideoDurationFilter;
 import scwen.com.dialynote.weight.divider.Api20ItemDivider;
 import scwen.com.dialynote.weight.divider.Api21ItemDivider;
 import scwen.com.dialynote.weight.divider.Divider;
 
 public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> implements PublishContract.PublishView {
+
+    private static final int REQUEST_PERMISSION_VIDEO = 99;  //请求拍照和录制视频权限
+    private static final int REQUEST_CODE_SELECT = 100;  //选择照片请求码
+    private static final int REQUEST_CODE_CAMERA = 200;  //拍照请求码
+    private static final int REQUEST_CODE_PREIMAGE = 300; //预览照片请求码
+    private static final int REQUEST_CODE_PREVIDEO = 400; //预览视频请求码
 
 
     @BindView(R.id.toolbar)
@@ -86,6 +116,8 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
     @Override
     protected void initView() {
+
+        EventBus.getDefault().register(this);
         loadingDialog = new LoadingDialog(this);
         loadingDialog.setCanceledOnTouchOutside(false);
 
@@ -94,6 +126,19 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
         mToolbar.setTitle(R.string.shortcut_label_publish_topic);
 
 
+        initDrawable();
+
+
+        initRecycler();
+
+
+
+
+
+
+    }
+
+    private void initDrawable() {
         lable = getResources().getDrawable(R.drawable.icon_lable);
         lable.setBounds(0, 0, lable.getMinimumWidth(), lable.getMinimumHeight());
         lableActive = getResources().getDrawable(R.drawable.icon_lable_active);
@@ -104,8 +149,9 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
         locationActive = getResources().getDrawable(R.drawable.icon_location_active);
         locationActive.setBounds(0, 0, locationActive.getMinimumWidth(), locationActive.getMinimumHeight());
+    }
 
-
+    private void initRecycler() {
         //初始化 9图 RecyclerView
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -155,10 +201,48 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 finish();
                 break;
             case R.id.publish:
-                Toast.makeText(PublishTopicActivity.this, "发布", Toast.LENGTH_SHORT).show();
+
+                publishTopic();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Subscribe
+    public void onChooseLocationEvent(PoiItem poiItem) {
+
+        LatLonPoint latLonPoint = poiItem.getLatLonPoint();
+
+        if (latLonPoint != null) {
+            mTopicPlace = poiItem.getTitle();
+            //选择地址的 纬度
+            mLatitude = latLonPoint.getLatitude();
+
+            //选择地址的经度
+            mLongitude = latLonPoint.getLongitude();
+            String showLocation = mTopicPlace;
+            if (!TextUtils.isEmpty(mTopicPlace) && mTopicPlace.length() > 4) {
+                showLocation = showLocation.substring(0, 4) + "...";
+            }
+            mTvLocation.setText(showLocation);
+            mTvLocation.setTextColor(UIUtils.getColor(R.color.ff4285F4));
+            mTvLocation.setCompoundDrawables(locationActive, null, null, null);
+        } else {
+            mTopicPlace = null;
+            mTvLocation.setText(R.string.location);
+            mTvLocation.setTextColor(UIUtils.getColor(R.color.ff969696));
+            mTvLocation.setCompoundDrawables(location, null, null, null);
+        }
+
+
+    }
+
+    /**
+     * 发布
+     */
+    private void publishTopic() {
+
+
     }
 
     @Override
@@ -198,11 +282,68 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 ChooseLocationActivity.start(this);
                 break;
             case R.id.tv_lable:
+
                 break;
             case R.id.iv_capture:
                 break;
             case R.id.iv_choose_album:
+
+                generPermissionAndChooseAlbum();
                 break;
         }
+    }
+
+    private void generPermissionAndChooseAlbum() {
+        AndPermission.with(this)
+                .runtime()
+                .permission(Permission.Group.STORAGE)
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        chooseAlbum();
+                    }
+                })
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+
+                    }
+                })
+                .start();
+    }
+
+    private void chooseAlbum() {
+        Divider divider = getDivider(Color.WHITE);
+        int itemSize = (ScreenUtils.getScreenWidth(this) - divider.getWidth() * (4)) / 3;
+        Matisse.from(PublishTopicActivity.this)
+                .choose(MimeType.of(MimeType.MP4,MimeType.PNG,MimeType.JPEG), true)
+                .countable(true)
+                .capture(false)
+                .theme(R.style.MyALbum)
+                .maxSelectable(9)
+                .addFilter(new VideoDurationFilter(3000))
+                .addFilter(new SizeFilter( 30 * Filter.K * Filter.K))
+                .gridExpectedSize(
+                        itemSize)
+                .thumbnailScale(0.85f)
+                .imageEngine(new GlideEngine())
+                .setOnSelectedListener(new OnSelectedListener() {
+                    @Override
+                    public void onSelected(
+                            @NonNull List<Uri> uriList, @NonNull List<String> pathList) {
+                        // DO SOMETHING IMMEDIATELY HERE
+                        Log.e("tag", "onSelected: pathList="+pathList );
+
+                    }
+                })
+                .originalEnable(false)
+                .setOnCheckedListener(new OnCheckedListener() {
+                    @Override
+                    public void onCheck(boolean isChecked) {
+                        // DO SOMETHING IMMEDIATELY HERE
+                        Log.e("tag", "onCheck: isChecked="+isChecked );
+                    }
+                })
+                .forResult(REQUEST_CODE_SELECT);
     }
 }
