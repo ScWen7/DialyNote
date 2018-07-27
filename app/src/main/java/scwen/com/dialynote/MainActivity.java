@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,14 +22,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import scwen.com.dialynote.adapter.main.MainTopicAdapter;
 import scwen.com.dialynote.appbase.BaseMvpActivity;
 import scwen.com.dialynote.contract.MainContract;
 import scwen.com.dialynote.domain.TopicBean;
+import scwen.com.dialynote.domain.TopicMultiItem;
 import scwen.com.dialynote.presenter.MainPresenterImpl;
 import scwen.com.dialynote.ui.publish.PublishTopicActivity;
 import scwen.com.dialynote.utils.StatusBarUtil;
@@ -49,6 +53,10 @@ public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements 
     RecyclerView mRecyMain;
     @BindView(R.id.swipe_main)
     SwipeRefreshLayout mSwipeMain;
+
+    private MainTopicAdapter mMainTopicAdapter;
+
+    private List<TopicMultiItem> mItems = new ArrayList<>();
 
 
     @Override
@@ -75,6 +83,19 @@ public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements 
                 PublishTopicActivity.start(MainActivity.this);
             }
         });
+
+        initRecycler();
+    }
+
+    private void initRecycler() {
+
+        mRecyMain.setLayoutManager(new LinearLayoutManager(this));
+
+        mMainTopicAdapter = new MainTopicAdapter(mItems);
+
+        mRecyMain.setAdapter(mMainTopicAdapter);
+
+
     }
 
     @Override
@@ -197,8 +218,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements 
     public void showTopicList(List<TopicBean> topicList) {
         if (topicList != null) {
             for (TopicBean topicBean : topicList) {
-                Log.e("TAG", topicBean.toString());
+                mItems.add(new TopicMultiItem<>(TopicMultiItem.ITEM_TOPIC, topicBean));
             }
+
+            mMainTopicAdapter.setNewData(mItems);
+            mMainTopicAdapter.disableLoadMoreIfNotFullPage(mRecyMain);
         }
     }
 

@@ -50,5 +50,6 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.yanzhenjie:permission:2.0.0-rc11'
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 
 }
