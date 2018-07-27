@@ -30,9 +30,9 @@ public class MainTopicAdapter extends BaseMultiItemQuickAdapter<TopicMultiItem, 
 
         TopicContainrView topicContainrView = helper.getView(R.id.container_topic);
 
-        topicContainrView.bindCommonData("张三", "", "",
+        topicContainrView.bindCommonData("张三", "", "1970-20-13 11：70",
 
-                "1970-20-13 11：70", "测试", "", "");
+                "测试");
 
         topicContainrView
                 .bindClick("", "", "")

@@ -5,12 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.v4.content.MimeTypeFilter;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -25,7 +20,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.amap.api.services.core.LatLonPoint;
@@ -38,8 +32,6 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
-import com.zhihu.matisse.internal.entity.Album;
-import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zhihu.matisse.listener.OnCheckedListener;
 import com.zhihu.matisse.listener.OnSelectedListener;
 
@@ -51,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import scwen.com.dialynote.R;
 import scwen.com.dialynote.adapter.publish.ChooseImageAdapter;
@@ -65,8 +56,6 @@ import scwen.com.dialynote.utils.ScreenUtils;
 import scwen.com.dialynote.utils.SizeFilter;
 import scwen.com.dialynote.utils.UIUtils;
 import scwen.com.dialynote.utils.VideoDurationFilter;
-import scwen.com.dialynote.weight.divider.Api20ItemDivider;
-import scwen.com.dialynote.weight.divider.Api21ItemDivider;
 import scwen.com.dialynote.weight.divider.Divider;
 
 public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> implements PublishContract.PublishView {
@@ -269,6 +258,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
         EventBus.getDefault().post(new PublishTopicEvent());
 
+
         finish();
 
     }
@@ -311,6 +301,8 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
             List<String> pathList = Matisse.obtainPathResult(data);
 
+            List<Uri> uris = Matisse.obtainResult(data);
+
             if (pathList != null && pathList.size() > 0) {
                 if (pathList.size() == 1) {
                     //因为 视频是单选，当 文件数量为1 时，进行文件类型的判断
@@ -318,9 +310,9 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                     mPathList.addAll(pathList);
                     String file = pathList.get(0);
 
-                    String ext = MimeTypeMap.getFileExtensionFromUrl(file);
-                    String extension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
-                    if (!TextUtils.isEmpty(extension)) {
+                    String extension = MimeTypeMap.getFileExtensionFromUrl(file);
+                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                    if (!TextUtils.isEmpty(mimeType)) {
                         if (extension.contains("video")) {
                             //文件类型为 视频
                             Log.e("TAG", "视频");
@@ -339,6 +331,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                     }
                 } else {
                     mPathList.addAll(pathList);
+                    topicType = TOPIC_IMAGE;
                     mFrVideo.setVisibility(View.GONE);
                     mRecyclerView.setVisibility(View.VISIBLE);
                     mAdapter.notifyDataSetChanged(mPathList);
@@ -367,6 +360,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
             mFrVideo.setVisibility(View.GONE);
         }
     }
+
 
     @OnClick({R.id.tv_location, R.id.tv_lable, R.id.iv_capture, R.id.iv_choose_album, R.id.fr_video})
     public void onViewClicked(View view) {
@@ -425,6 +419,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 .theme(R.style.MyALbum)
                 .maxSelectablePerMediaType(9, 1)
                 .addFilter(new VideoDurationFilter(3000))
+                .addFilter(new scwen.com.dialynote.utils.MimeTypeFilter())
                 .addFilter(new SizeFilter(30 * Filter.K * Filter.K))
                 .gridExpectedSize(
                         itemSize)

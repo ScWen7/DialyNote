@@ -106,10 +106,8 @@ public class TopicContainrView extends CardView {
      * @param username  用户名称
      * @param time      发布时间
      * @param label     标签
-     * @param hits      看过数量
-     * @param comNumber
      */
-    public TopicContainrView bindCommonData(String username, String avater, String isMember, String time, String label, String hits, String comNumber) {
+    public TopicContainrView bindCommonData(String username, String avater,  String time, String label) {
         mTvName.setText(username);
 //        Glide.with(getContext())
 //                .load(avater)
