@@ -48,7 +48,7 @@ public class HttpParamInterceptor implements Interceptor {
         Request request = chain.request();
         Request.Builder requestBuilder = request.newBuilder();
         //添加公共的头部
-        requestBuilder.addHeader("User-Agent", "pinxiango");
+        requestBuilder.addHeader("ReplyUser-Agent", "pinxiango");
 
 
         String method = request.method();

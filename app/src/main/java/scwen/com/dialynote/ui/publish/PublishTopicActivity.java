@@ -38,6 +38,7 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
+import com.zhihu.matisse.internal.entity.Album;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zhihu.matisse.listener.OnCheckedListener;
 import com.zhihu.matisse.listener.OnSelectedListener;
@@ -46,6 +47,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -56,6 +58,8 @@ import scwen.com.dialynote.adapter.publish.ChooseImageAdapter;
 import scwen.com.dialynote.appbase.BaseMvpActivity;
 import scwen.com.dialynote.contract.PublishContract;
 import scwen.com.dialynote.dialog.LoadingDialog;
+import scwen.com.dialynote.domain.TopicBean;
+import scwen.com.dialynote.event.PublishTopicEvent;
 import scwen.com.dialynote.presenter.PublishPresenter;
 import scwen.com.dialynote.utils.ScreenUtils;
 import scwen.com.dialynote.utils.SizeFilter;
@@ -184,7 +188,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
      * @param position
      */
     private void previewAlbum(int position) {
-        ImagePreviewActivity.start(this);
+        ImagePreviewActivity.start(this, new ArrayList<String>(mPathList), position, REQUEST_CODE_PREIMAGE);
     }
 
 
@@ -245,6 +249,27 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
      */
     private void publishTopic() {
 
+        String content = mEdtContent.getText().toString();
+
+        TopicBean topicBean = new TopicBean();
+        topicBean.setContent(content);
+        topicBean.setPublishTime(new Date().getTime());
+        topicBean.setInfoType("0");
+        topicBean.setType(topicType);
+        switch (topicType) {
+            case TOPIC_IMAGE:
+                topicBean.setImages(mPathList);
+                break;
+            case TOPIC_VIDEO:
+                topicBean.setVideos(mPathList);
+                break;
+
+        }
+        topicBean.save();
+
+        EventBus.getDefault().post(new PublishTopicEvent());
+
+        finish();
 
     }
 
@@ -320,6 +345,26 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 }
             }
 
+        } else if (requestCode == REQUEST_CODE_PREIMAGE && resultCode == RESULT_OK) {
+            if (data == null) {
+                return;
+            }
+            //预览图片回调
+            ArrayList<String> extra = data.getStringArrayListExtra(ImagePreviewActivity.IMAGE_PATHS);
+            if (extra != null) {
+                mPathList = extra;
+                if (extra.size() > 0) {
+                    topicType = TOPIC_IMAGE;
+                    mAdapter.notifyDataSetChanged(mPathList);
+                } else {
+                    topicType = TOPIC_TEXT;
+                    mRecyclerView.setVisibility(View.GONE);
+                }
+            }
+        } else if (requestCode == REQUEST_CODE_PREVIDEO && resultCode == RESULT_OK) {
+            topicType = TOPIC_TEXT;
+            mPathList.remove(0);
+            mFrVideo.setVisibility(View.GONE);
         }
     }
 

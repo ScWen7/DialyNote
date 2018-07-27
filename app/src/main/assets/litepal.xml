@@ -9,5 +9,6 @@
 
         <mapping class="scwen.com.dialynote.domain.LabelBean"></mapping>
         <mapping class="scwen.com.dialynote.domain.TopicBean"></mapping>
+        <mapping class="scwen.com.dialynote.domain.User"></mapping>
     </list>
 </litepal>

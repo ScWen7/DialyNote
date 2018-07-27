@@ -11,23 +11,30 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import scwen.com.dialynote.appbase.BaseMvpActivity;
+import scwen.com.dialynote.contract.MainContract;
+import scwen.com.dialynote.domain.TopicBean;
+import scwen.com.dialynote.presenter.MainPresenterImpl;
 import scwen.com.dialynote.ui.publish.PublishTopicActivity;
 import scwen.com.dialynote.utils.StatusBarUtil;
 import scwen.com.dialynote.utils.UIUtils;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements NavigationView.OnNavigationItemSelectedListener, MainContract.MainView {
 
 
     @BindView(R.id.toolbar)
@@ -38,14 +45,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DrawerLayout mDrawerLayout;
     @BindView(R.id.fab_add)
     FloatingActionButton mFabAdd;
+    @BindView(R.id.recy_main)
+    RecyclerView mRecyMain;
+    @BindView(R.id.swipe_main)
+    SwipeRefreshLayout mSwipeMain;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        ButterKnife.bind(this);
-        StatusBarUtil.setColorForDrawerLayout(this,mDrawerLayout, UIUtils.getColor(R.color.colorPrimary),50);
+    protected void initView() {
+        StatusBarUtil.setColorForDrawerLayout(this, mDrawerLayout, UIUtils.getColor(R.color.colorPrimary), 50);
 
         enableShortcuts();
 
@@ -67,8 +75,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 PublishTopicActivity.start(MainActivity.this);
             }
         });
+    }
 
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
+    }
 
+    @Override
+    protected void initData() {
+        mPresenter.getAllTopics();
+    }
+
+    @Override
+    public MainPresenterImpl createPresenter() {
+        return new MainPresenterImpl(this);
     }
 
     //如果有Menu,创建完后,系统会自动添加到ToolBar上
@@ -161,4 +182,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    public void showLoading() {
+        mSwipeMain.setRefreshing(true);
+    }
+
+    @Override
+    public void dismissLoading() {
+        mSwipeMain.setRefreshing(false);
+    }
+
+    @Override
+    public void showTopicList(List<TopicBean> topicList) {
+        if (topicList != null) {
+            for (TopicBean topicBean : topicList) {
+                Log.e("TAG", topicBean.toString());
+            }
+        }
+    }
+
 }

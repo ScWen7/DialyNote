@@ -16,6 +16,24 @@ public class TopicBean extends LitePalSupport {
     private String place;
     private String atitude;
     private String longitude;
+    private Long publishTime;
+    private String infoType;
+
+    public String getInfoType() {
+        return infoType == null ? "" : infoType;
+    }
+
+    public void setInfoType(String infoType) {
+        this.infoType = infoType;
+    }
+
+    public Long getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(Long publishTime) {
+        this.publishTime = publishTime;
+    }
 
     private LabelBean labelBean;
 
@@ -93,5 +111,18 @@ public class TopicBean extends LitePalSupport {
 
     public void setVideos(List<String> videos) {
         this.videos = videos;
+    }
+
+
+    @Override
+    public String toString() {
+        return "TopicBean{" +
+                "content='" + content + '\'' +
+                ", publishTime=" + publishTime +
+                ", infoType='" + infoType + '\'' +
+                ", type=" + type +
+                ", images=" + images +
+                ", videos=" + videos +
+                '}';
     }
 }

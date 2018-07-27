@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- * User: Season(ssseasonnn@gmail.com)
+ * ReplyUser: Season(ssseasonnn@gmail.com)
  * Date: 2016-07-15
  * Time: 15:48
  * 表示下载状态, 如果isChunked为true, totalSize 可能不存在

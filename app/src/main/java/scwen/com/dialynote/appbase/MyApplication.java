@@ -38,6 +38,7 @@ public class MyApplication extends LitePalApplication {
         super.onCreate();
         instence = this;
         UIUtils.init(this);
+        
     }
 
     public static MyApplication getInstence() {

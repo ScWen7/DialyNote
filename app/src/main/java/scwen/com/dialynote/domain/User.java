@@ -1,34 +1,59 @@
 package scwen.com.dialynote.domain;
 
+import org.litepal.crud.LitePalSupport;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * @author yiw
- * @ClassName: User
- * @Description: TODO(这里用一句话描述这个类的作用)
- * @date 2015-12-28 下午3:45:04
+ * Created by scwen on 2018/7/27.
+ * QQ ：811733738
+ * 作用：
  */
-public class User {
-    private String id;
-    private String name;
 
-    public User(String id, String name) {
-        this.id = id;
-        this.name = name;
+public class User extends LitePalSupport {
+
+    private String userId;
+
+    private String userName;
+
+    private String avater;
+
+    private List<TopicBean> topics;
+
+
+    public String getUserId() {
+        return userId == null ? "" : userId;
     }
 
-    public String getId() {
-        return id == null ? "" : id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getUserName() {
+        return userName == null ? "" : userName;
     }
 
-    public String getName() {
-        return name == null ? "" : name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getAvater() {
+        return avater == null ? "" : avater;
     }
 
+    public void setAvater(String avater) {
+        this.avater = avater;
+    }
+
+    public List<TopicBean> getTopics() {
+        if (topics == null) {
+            return new ArrayList<>();
+        }
+        return topics;
+    }
+
+    public void setTopics(List<TopicBean> topics) {
+        this.topics = topics;
+    }
 }

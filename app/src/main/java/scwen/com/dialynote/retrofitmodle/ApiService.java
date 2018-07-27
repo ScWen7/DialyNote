@@ -12,7 +12,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
-import scwen.com.dialynote.domain.User;
+import scwen.com.dialynote.domain.ReplyUser;
 
 /**
  * Created by 解晓辉 on 2017/6/26.
@@ -23,7 +23,7 @@ public interface ApiService {
 
 
     @POST("memberLogin")
-    Observable<BaseResult<String>> login(@Body User user);
+    Observable<BaseResult<String>> login(@Body ReplyUser user);
 
 
     @POST("getMemberInfo")

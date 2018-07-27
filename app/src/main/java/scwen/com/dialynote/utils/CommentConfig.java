@@ -5,7 +5,7 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import scwen.com.dialynote.domain.User;
+import scwen.com.dialynote.domain.ReplyUser;
 
 /**
  * Created by yiwei on 16/3/2.
@@ -24,7 +24,7 @@ public class CommentConfig {
     public int circlePosition;
     public int commentPosition;
     private int commentType;
-    public User replyUser;
+    public ReplyUser mReplyReplyUser;
 
     public int getCommentType() {
         return commentType;
@@ -37,12 +37,12 @@ public class CommentConfig {
     @Override
     public String toString() {
         String replyUserStr = "";
-        if (replyUser != null) {
-            replyUserStr = replyUser.toString();
+        if (mReplyReplyUser != null) {
+            replyUserStr = mReplyReplyUser.toString();
         }
         return "circlePosition = " + circlePosition
                 + "; commentPosition = " + commentPosition
                 + "; commentType ＝ " + commentType
-                + "; replyUser = " + replyUserStr;
+                + "; mReplyReplyUser = " + replyUserStr;
     }
 }
