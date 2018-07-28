@@ -45,6 +45,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import scwen.com.dialynote.R;
 import scwen.com.dialynote.adapter.publish.ChooseImageAdapter;
 import scwen.com.dialynote.appbase.BaseMvpActivity;
@@ -54,8 +57,11 @@ import scwen.com.dialynote.dialog.LoadingDialog;
 import scwen.com.dialynote.domain.TopicBean;
 import scwen.com.dialynote.event.PublishTopicEvent;
 import scwen.com.dialynote.presenter.PublishPresenter;
+import scwen.com.dialynote.retrofitmodle.rxhelper.RxSchedulerHepler;
+import scwen.com.dialynote.utils.MediaScanner;
 import scwen.com.dialynote.utils.ScreenUtils;
 import scwen.com.dialynote.utils.SizeFilter;
+import scwen.com.dialynote.utils.ThumbnailBuilder;
 import scwen.com.dialynote.utils.UIUtils;
 import scwen.com.dialynote.utils.VideoDurationFilter;
 import scwen.com.dialynote.weight.divider.Divider;
@@ -104,10 +110,13 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
     private Drawable location;
     private Drawable locationActive;
     private String mTopicPlace; //发布文章的 位置
+
     private double mLatitude;  //纬度
     private double mLongitude;  //经度
 
     private List<String> mPathList = new ArrayList<>();
+
+    private MediaScanner mMediaScanner;
 
 
     public static void start(Context context) {
@@ -310,17 +319,16 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                     mPathList.addAll(pathList);
                     String file = pathList.get(0);
                     // 已经进行了 mimeType 获取的判断
-                    String extension = MimeTypeMap.getFileExtensionFromUrl(file);
-                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                    String mimeType = getMimeType(file);
                     if (!TextUtils.isEmpty(mimeType)) {
-                        if (extension.contains("video")) {
+                        if (mimeType.contains("video")) {
                             //文件类型为 视频
                             Log.e("TAG", "视频");
                             topicType = TOPIC_VIDEO;
                             mFrVideo.setVisibility(View.VISIBLE);
                             mRecyclerView.setVisibility(View.GONE);
                             Glide.with(PublishTopicActivity.this).load(file).into(mIvVideoThumb);
-                        } else {
+                        } else if (mimeType.contains("image")) {
                             //文件类型为  图片
                             Log.e("TAG", "图片");
                             topicType = TOPIC_IMAGE;
@@ -358,7 +366,77 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
             topicType = TOPIC_TEXT;
             mPathList.remove(0);
             mFrVideo.setVisibility(View.GONE);
+        } else if (requestCode == REQUEST_CODE_CAMERA && resultCode == CameraActivity.RESULTCODE_IMAGE) {
+            //拍摄照片成功
+            if (data == null) {
+                return;
+            }
+            String imagePath = data.getStringExtra(CameraActivity.PARAM_FILE_PATH);
+
+            mPathList.add(imagePath);
+
+            topicType = TOPIC_IMAGE;
+            mFrVideo.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mAdapter.notifyDataSetChanged(mPathList);
+
+            scanFile(imagePath);
+
+        } else if (requestCode == REQUEST_CODE_CAMERA && resultCode == CameraActivity.RESULTCODE_VIDEO) {
+            //拍摄视频成功
+            if (data == null) {
+                return;
+            }
+            String videoPath = data.getStringExtra(CameraActivity.PARAM_FILE_PATH);
+
+            mPathList.add(videoPath);
+
+            buildVideoThumb(videoPath);
+
+            scanFile(videoPath);
+
         }
+    }
+
+    /**
+     * 系统文件夹 扫描
+     * @param filePath
+     */
+    private void scanFile(String filePath) {
+        if(mMediaScanner==null) {
+            mMediaScanner = new MediaScanner(getApplicationContext());
+        }
+        mMediaScanner.scan(filePath);
+    }
+
+    private void buildVideoThumb(String videoPath) {
+        Observable.just(videoPath)
+                .map(new Function<String, String>() {
+                    @Override
+                    public String apply(String s) throws Exception {
+                        return new ThumbnailBuilder(getApplicationContext()).createThumbnailForVideo(s);
+                    }
+                })
+                .compose(RxSchedulerHepler.<String>io_main())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        //将缩略图 添加到  集合中
+                        mPathList.add(s);
+                        topicType = TOPIC_VIDEO;
+                        mFrVideo.setVisibility(View.VISIBLE);
+                        mRecyclerView.setVisibility(View.GONE);
+                        Glide.with(PublishTopicActivity.this).load(s).into(mIvVideoThumb);
+                    }
+                });
+
+    }
+
+
+    private String getMimeType(String path) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return mimeType;
     }
 
 
@@ -397,7 +475,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                        dispatchGrantedPermission();
+                        capture();
                     }
                 })
                 .onDenied(new Action<List<String>>() {
@@ -410,15 +488,18 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
     }
 
     /**
-     * 申请权限成功
+     * 跳转 拍照界面
      *
      * @param
      */
-    private void dispatchGrantedPermission() {
+    private void capture() {
         int cameraMode;
 
-        cameraMode = JCameraView.BUTTON_STATE_BOTH;
-
+        if (mPathList == null || mPathList.size() == 0) {
+            cameraMode = JCameraView.BUTTON_STATE_BOTH;
+        } else {
+            cameraMode = JCameraView.BUTTON_STATE_ONLY_CAPTURE;
+        }
         CameraActivity.start(this, REQUEST_CODE_CAMERA, cameraMode);
     }
 
@@ -450,7 +531,7 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 .onDenied(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-
+                        showDeniedAuction();
                     }
                 })
                 .start();

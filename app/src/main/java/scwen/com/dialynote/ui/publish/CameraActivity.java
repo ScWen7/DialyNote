@@ -61,13 +61,13 @@ public class CameraActivity extends AppCompatActivity {
         String tip = "";
         switch (cameraMode) {
             case JCameraView.BUTTON_STATE_BOTH:
-                tip = "轻触拍照  按住录像";
+                tip = "轻触拍照  按住拍摄";
                 break;
             case JCameraView.BUTTON_STATE_ONLY_CAPTURE:
                 tip = "当前仅支持拍照";
                 break;
             case JCameraView.BUTTON_STATE_ONLY_RECORDER:
-                tip = "按住拍照";
+                tip = "按住拍摄";
                 break;
         }
         jCameraView.setTip(tip);

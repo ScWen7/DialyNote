@@ -99,7 +99,7 @@ public class CameraInterface implements Camera.PreviewCallback {
     private int recordScleRate = 0;
 
     //视频质量
-    private int mediaQuality = JCameraView.MEDIA_QUALITY_MIDDLE;
+    private int mediaQuality = JCameraView.MEDIA_QUALITY_HIGH;
     private SensorManager sm = null;
 
     //获取CameraInterface单例
