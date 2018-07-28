@@ -117,7 +117,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
+//        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
         return true;
     }
 

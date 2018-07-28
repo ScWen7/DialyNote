@@ -161,9 +161,11 @@ public class LocationPresenter extends BasePresenter<LocationModel, LocationCont
     @Override
     public void detachView() {
         super.detachView();
-        mMLocationClient.stopLocation();
-        mMLocationClient.unRegisterLocationListener(mAMapLocationListener);
-        mAMapLocationListener = null;
+        if (mMLocationClient != null) {
+            mMLocationClient.stopLocation();
+            mMLocationClient.unRegisterLocationListener(mAMapLocationListener);
+            mAMapLocationListener = null;
+        }
         mQuery = null;
     }
 }
