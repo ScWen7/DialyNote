@@ -1,6 +1,8 @@
 package scwen.com.dialynote.appbase;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import org.litepal.LitePalApplication;
 
@@ -31,6 +33,13 @@ public class MyApplication extends LitePalApplication {
         }
         return mLocationEvent;
     }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
 
 
     @Override

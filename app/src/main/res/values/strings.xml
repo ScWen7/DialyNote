@@ -17,4 +17,6 @@
     <string name="location_failed">定位失败</string>
     <string name="error_original">大小不超过 %1$sM。</string>
     <string name="delete">删除</string>
+    <string name="permission_failed">授权失败</string>
+    <string name="to_setting">去设置</string>
 </resources>

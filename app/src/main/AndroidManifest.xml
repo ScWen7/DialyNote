@@ -16,6 +16,8 @@
     <!-- 允许程序访问CellID或WiFi热点来获取粗略的位置 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".appbase.MyApplication"
@@ -60,6 +62,11 @@
 
         <activity android:name=".ui.publish.VideoPreviewActivity" />
         <activity android:name=".ui.publish.ImagePreviewActivity" ></activity>
+
+        <activity
+            android:name=".ui.publish.CameraActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

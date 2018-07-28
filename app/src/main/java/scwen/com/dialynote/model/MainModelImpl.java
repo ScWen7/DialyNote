@@ -18,6 +18,7 @@ public class MainModelImpl implements MainContract.MainModel {
     @Override
     public Observable<List<TopicBean>> provideAllTopics() {
 
-        return Observable.just(LitePal.findAll(TopicBean.class));
+        //数据库查询 按照 发布时间 倒序 排序
+        return Observable.just(LitePal.order("publishTime desc").find(TopicBean.class));
     }
 }

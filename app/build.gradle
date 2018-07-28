@@ -8,6 +8,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -51,5 +52,7 @@ dependencies {
     implementation 'com.yanzhenjie:permission:2.0.0-rc11'
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
+
+    compile 'com.android.support:multidex:1.0.1'
 
 }

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -47,6 +48,7 @@ import butterknife.OnClick;
 import scwen.com.dialynote.R;
 import scwen.com.dialynote.adapter.publish.ChooseImageAdapter;
 import scwen.com.dialynote.appbase.BaseMvpActivity;
+import scwen.com.dialynote.camera.JCameraView;
 import scwen.com.dialynote.contract.PublishContract;
 import scwen.com.dialynote.dialog.LoadingDialog;
 import scwen.com.dialynote.domain.TopicBean;
@@ -301,15 +303,13 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
 
             List<String> pathList = Matisse.obtainPathResult(data);
 
-            List<Uri> uris = Matisse.obtainResult(data);
-
             if (pathList != null && pathList.size() > 0) {
                 if (pathList.size() == 1) {
                     //因为 视频是单选，当 文件数量为1 时，进行文件类型的判断
 
                     mPathList.addAll(pathList);
                     String file = pathList.get(0);
-
+                    // 已经进行了 mimeType 获取的判断
                     String extension = MimeTypeMap.getFileExtensionFromUrl(file);
                     String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
                     if (!TextUtils.isEmpty(mimeType)) {
@@ -369,9 +369,12 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 ChooseLocationActivity.start(this);
                 break;
             case R.id.tv_lable:
-
+                //跳转至 选择界面
+                ChooseLabelActivity.start(this);
                 break;
             case R.id.iv_capture:
+
+                generPermissionAndCapture();
 
                 break;
             case R.id.iv_choose_album:
@@ -382,6 +385,53 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 VideoPreviewActivity.start(this, mPathList.get(0));
                 break;
         }
+    }
+
+    /**
+     * 申请拍照权限并且 跳转拍照界面
+     */
+    private void generPermissionAndCapture() {
+        AndPermission.with(this)
+                .runtime()
+                .permission(Permission.Group.STORAGE, Permission.Group.CAMERA)
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        dispatchGrantedPermission();
+                    }
+                })
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        showDeniedAuction();
+                    }
+                })
+                .start();
+    }
+
+    /**
+     * 申请权限成功
+     *
+     * @param
+     */
+    private void dispatchGrantedPermission() {
+        int cameraMode;
+
+        cameraMode = JCameraView.BUTTON_STATE_BOTH;
+
+        CameraActivity.start(this, REQUEST_CODE_CAMERA, cameraMode);
+    }
+
+    private void showDeniedAuction() {
+
+        Snackbar.make(mToolbar, R.string.permission_failed, Snackbar.LENGTH_SHORT)
+                .setAction(R.string.to_setting, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AndPermission.with(PublishTopicActivity.this).runtime().setting().start();
+                    }
+                })
+                .show();
     }
 
     /**
@@ -418,8 +468,8 @@ public class PublishTopicActivity extends BaseMvpActivity<PublishPresenter> impl
                 .capture(false)
                 .theme(R.style.MyALbum)
                 .maxSelectablePerMediaType(9, 1)
-                .addFilter(new VideoDurationFilter(3000))
-                .addFilter(new scwen.com.dialynote.utils.MimeTypeFilter())
+                .addFilter(new VideoDurationFilter(3000))  //时长过滤
+                .addFilter(new scwen.com.dialynote.utils.MimeTypeFilter()) //MimeType 顾虑
                 .addFilter(new SizeFilter(30 * Filter.K * Filter.K))
                 .gridExpectedSize(
                         itemSize)
