@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply from: "deploy.gradle"
 android {
     compileSdkVersion 27
     defaultConfig {

@@ -1,0 +1,25 @@
+task Test1(dependsOn: "assembleRelease"){
+    doLast{
+        android.applicationVariants.each { variant ->
+            if ("release" != variant.buildType.name) return
+
+            variant.outputs.each { output ->
+                println output.getOutputFile()
+
+                def outputFile = output.outputFile
+
+                def fileName = "DialyNote-" +
+                        "${variant.buildType.name}-" +
+//                        "${variant.flavorName}-" +
+                        "v${variant.versionName}." +
+                        "${variant.versionCode}"
+                def outputPath = "../output/"
+                copy {
+                    from outputFile
+                    into outputPath
+                    rename { fileName + ".apk" }
+                }
+            }
+        }
+    }
+}
