@@ -25,6 +25,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,6 +87,29 @@ public class MainActivity extends BaseMvpActivity<MainPresenterImpl> implements 
         });
 
         initRecycler();
+
+
+        main();
+
+    }
+
+    public  static  void main(){
+        String content ="<p><input class=\"content\" type=\"checkbox\"  >Fdsasfasdadas</p>";
+        String regsx = "<p><input(.*)type=\"checkbox\" (.*?) >(.*?)</p>";
+
+
+        Pattern p_img = Pattern.compile(regsx);
+        Matcher m_img = p_img.matcher(content);
+        int i = m_img.groupCount();
+
+        if(m_img.find()) {
+            String group = m_img.group(2);
+
+            String group1 = m_img.group(3);
+
+            Log.e("TAG", "ada");
+        }
+
     }
 
     private void initRecycler() {
